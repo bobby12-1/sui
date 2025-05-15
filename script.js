@@ -56,7 +56,7 @@ function submitBooking(event) {
   }
 }
 
-fetch('/api/book', {
+fetch('https://sui-o7jb.onrender.com', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
