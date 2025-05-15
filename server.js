@@ -17,46 +17,66 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Booking route
 app.post("/api/book", async (req, res) => {
-  const { name, email, room, guests, checkin, checkout } = req.body;
+  const { name, email, room, guests, checkin, checkout, paymentMethod, reference } = req.body;
 
-  // Email transporter setup (use your real email/password in environment variables)
+  // Email transporter setup
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "dotmotsuites@gmail.com", // Replace with your actual email
-      pass: "etsj hifb lxpi jibc", // Use an App Password if using Gmail
-    },
+      user: "dotmotsuites@gmail.com",
+      pass: "etsj hifb lxpi jibc" // App password (safe for now, but should use env vars)
+    }
   });
 
-  const mailOptions = {
-    from: email,
-    to: "dotmotsuites@gmail.com", // Hotel's receiving address
-    subject: `New Booking Request from ${name}`,
+  // 1. Email to Hotel Admin
+  const adminMailOptions = {
+    from: "dotmotsuites@gmail.com",
+    to: "dotmotsuites@gmail.com", // Admin's own inbox
+    subject: `📬 New Booking from ${name}`,
     text: `
-      Full Name: ${name}
+      You received a new booking:
+
+      Name: ${name}
       Email: ${email}
       Room Type: ${room}
       Guests: ${guests}
-      Check-in Date: ${checkin}
-      Check-out Date: ${checkout}
-    `,
+      Check-in: ${checkin}
+      Check-out: ${checkout}
+      Payment Method: ${paymentMethod}
+      Reference: ${reference || 'N/A'}
+    `
+  };
+
+  // 2. Confirmation Email to Guest (Optional but nice)
+  const guestMailOptions = {
+    from: "dotmotsuites@gmail.com",
+    to: email,
+    subject: "✅ Booking Confirmation - Dotmot Hotel",
+    text: `
+      Dear ${name},
+
+      Thank you for booking with Dotmot Hotel & Suites!
+
+      Here are your booking details:
+      Room Type: ${room}
+      Guests: ${guests}
+      Check-in: ${checkin}
+      Check-out: ${checkout}
+      Payment Method: ${paymentMethod}
+      Reference: ${reference || 'BANK_TRANSFER'}
+
+      We look forward to hosting you!
+
+      - Dotmot Hotel & Suites
+    `
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: "Booking submitted successfully." });
+    await transporter.sendMail(adminMailOptions);
+    await transporter.sendMail(guestMailOptions); // optional, you can comment this out if not needed
+    res.status(200).json({ success: true, message: "Booking email sent to admin and guest." });
   } catch (error) {
-    console.error("Email send error:", error);
-    res.status(500).json({ message: "Failed to send booking email." });
+    console.error("Email error:", error);
+    res.status(500).json({ success: false, message: "Failed to send email." });
   }
-});
-
-// Default route: Serve booking.html on GET /
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "booking.html"));
-  console.log(__dirname, __filename);
-});
-
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
 });
