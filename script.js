@@ -56,7 +56,7 @@ function submitBooking(event) {
   }
 }
 
-fetch('https://ssuite.onrender.com', {
+fetch('https://fresh-2q5l.onrender.com', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
