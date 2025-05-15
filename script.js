@@ -56,7 +56,7 @@ function submitBooking(event) {
   }
 }
 
-fetch('https://dotmot-backend.onrender.com/api/book', {
+fetch('/api/book', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
