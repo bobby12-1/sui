@@ -56,7 +56,7 @@ function submitBooking(event) {
   }
 }
 
-fetch('https://sui-o7jb.onrender.com', {
+fetch('https://dotmot-backend.onrender.com', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
