@@ -1,0 +1,35 @@
+const bookingData = {
+  name,
+  email,
+  room,
+  guests,
+  checkin,
+  checkout,
+  paymentMethod,
+  reference,
+  timestamp: new Date().toISOString()
+};
+
+// Save to bookings.json
+const filePath = path.join(__dirname, "bookings.json");
+
+fs.readFile(filePath, "utf8", (err, data) => {
+  let bookings = [];
+  if (!err && data) {
+    try {
+      bookings = JSON.parse(data);
+    } catch (e) {
+      console.error("Error parsing bookings.json:", e);
+    }
+  }
+
+  bookings.push(bookingData);
+
+  fs.writeFile(filePath, JSON.stringify(bookings, null, 2), err => {
+    if (err) {
+      console.error("Error saving booking:", err);
+    } else {
+      console.log("Booking saved to file.");
+    }
+  });
+});
